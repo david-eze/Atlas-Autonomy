@@ -10,7 +10,7 @@ An autonomous indoor mobile robot stack built with ROS 2, Gazebo Harmonic, Nav2,
 
 ---
 
-## 1. Project Overview
+## Project Overview
 
 This platform implements an autonomous warehouse/service robot capable of operating in initially unknown indoor environments. Rather than relying on simple teleoperation or basic Nav2 tutorials, the system demonstrates robust engineering principles:
 * **Autonomous Frontier Exploration**: Maps unknown environments dynamically without human guidance.
@@ -21,7 +21,7 @@ This platform implements an autonomous warehouse/service robot capable of operat
 
 ---
 
-## 2. Project Demonstration
+## Project Demonstration
 
 ### Autonomous Exploration
 ![Autonomous Exploration](results/gifs/exploration_demo.gif)
@@ -37,7 +37,7 @@ This platform implements an autonomous warehouse/service robot capable of operat
 
 ---
 
-## 3. Key Capabilities
+## Key Capabilities
 
 * **Map Building & Localization**: SLAM Toolbox graph optimization transitioning to AMCL particle filtering upon map completion.
 * **Pluggable Global Planners**: Custom C++ implementations of A* and Dijkstra evaluated side-by-side with Nav2 default planners.
@@ -48,7 +48,7 @@ This platform implements an autonomous warehouse/service robot capable of operat
 
 ---
 
-## 4. System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -71,7 +71,7 @@ graph TD
 
 ---
 
-## 5. Hardware / Robot Architecture
+## Hardware / Robot Architecture
 
 The simulated platform is a differential-drive mobile robot configured with realistic physical parameters:
 
@@ -86,7 +86,7 @@ The simulated platform is a differential-drive mobile robot configured with real
 
 ---
 
-## 6. Software Stack
+## Software Stack
 
 | Component | Technology | Purpose |
 |---|---|---|
@@ -103,7 +103,7 @@ The simulated platform is a differential-drive mobile robot configured with real
 
 ---
 
-## 7. TF2 Architecture
+## TF2 Architecture
 
 ```mermaid
 graph TD
@@ -125,7 +125,7 @@ graph TD
 
 ---
 
-## 8. Path Planning: A* vs Dijkstra
+## Path Planning: A* vs Dijkstra
 
 ### Mathematical Formulation
 For any grid node $n$:
@@ -148,7 +148,7 @@ Path Length (m)        11.32 m          11.35 m               11.45 m
 
 ---
 
-## 9. Dynamic Obstacle Avoidance & Navigation
+## Dynamic Obstacle Avoidance & Navigation
 
 ![Navigation Performance](results/graphs/navigation_performance.png)
 
@@ -162,7 +162,7 @@ Challenging         32.4 s               0.35 m               3.0
 
 ---
 
-## 10. Localization Performance & Ground Truth
+## Localization Performance & Ground Truth
 
 ![Localization Accuracy](results/graphs/localization_accuracy.png)
 
@@ -170,7 +170,7 @@ Challenging         32.4 s               0.35 m               3.0
 
 ---
 
-## 11. AI / Semantic Navigation
+## AI / Semantic Navigation
 
 Natural language commands are parsed and converted into physical map targets without allowing AI to touch low-level motor controllers:
 
@@ -183,13 +183,13 @@ Command: "Go to the workstation"
 
 ---
 
-## 12. Safety Architecture
+## Safety Architecture
 
 The `safety_monitor` node runs as an independent process subscribing directly to `/scan` and intercepting `/cmd_vel`. If $\min(d_{\text{obstacle}}) < 0.30\text{ m}$ during forward motion, it immediately overrides `/cmd_vel` to $0.0\text{ m/s}$.
 
 ---
 
-## 13. How to Run
+## How to Run
 
 ### 1. Build Workspace
 ```bash
@@ -217,7 +217,7 @@ py -m unittest discover -s tests -p "test_*.py"
 
 ---
 
-## 14. Repository Structure
+## Repository Structure
 
 ```text
 robot_autonomy/
@@ -246,7 +246,7 @@ robot_autonomy/
 
 ---
 
-## 15. Engineering Decisions
+## Engineering Decisions
 
 1. **Why Differential Drive?**: Provides simple, robust kinematics with in-place rotation capability, ideal for narrow indoor corridors.
 2. **Why Separate AI from Control?**: Ensures safety compliance. AI models are probabilistic and can fail on out-of-distribution inputs. Deterministic costmaps and safety monitors guarantee physical bounds regardless of AI output.
@@ -254,13 +254,13 @@ robot_autonomy/
 
 ---
 
-## 16. Limitations & Future Work
+## Limitations & Future Work
 
 * **Limitations**: 2D LiDAR cannot detect low overhangs or obstacles below laser scan plane; simulation physics simplifies real-world wheel traction variations.
 * **Future Work**: Integrate 3D LiDAR/VIO state estimation, multi-robot fleet coordination, and automated charging dock alignment.
 
 ---
 
-## 17. What I Learned
+## What I Learned
 
 Building this project reinforced the critical importance of decoupled robotics architecture. Isolating high-level semantic intent from low-level deterministic safety constraints prevents unpredictable behavior. Furthermore, quantitative benchmarking proved essential: states like "A* is faster" are only meaningful when backed by node expansion metrics and timing data across controlled test environments.
