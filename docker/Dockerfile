@@ -1,23 +1,9 @@
-# ROS 2 Jazzy + Gazebo Harmonic development image for the robot_autonomy project.
-#
-# Build:
-#   docker build -t robot_autonomy:jazzy -f docker/Dockerfile .
-#
-# Run (Linux, with GUI):
-#   docker compose -f docker/docker-compose.yml up
-#
-# Run (headless benchmarks):
-#   docker compose -f docker/docker-compose.yml run --rm robot bash
-#
-# NOTE: Gazebo Harmonic ships with Ubuntu 24.04 (noble).
-
 FROM ros:jazzy-ros-base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-# Core tooling and Python data-science stack.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release wget gnupg curl git \
     python3-pip python3-vcstool python3-colcon-common-extensions python3-rosdep \
@@ -27,7 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-sqlalchemy python3-psutil \
     && rm -rf /var/lib/apt/lists/*
 
-# ROS 2 simulation, navigation, SLAM, and tooling packages.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-ros2-control ros-jazzy-ros2-controllers \
     ros-jazzy-gazebo-ros-pkgs ros-jazzy-gazebo-ros2-control ros-jazzy-gazebo-plugins \
@@ -57,16 +42,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-launch-testing-ament-cmake ros-jazzy-ros-testing ros-jazzy-geometry2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Python ML dependencies for the perceptual layer.
 RUN pip3 install --no-cache-dir \
     ultralytics supervision onnxruntime torchvision pandas seaborn \
     imageio imageio-ffmpeg tqdm pyyaml websockets fastapi uvicorn pydantic
 
-# Create the workspace.
 WORKDIR /workspace
 RUN mkdir -p /workspace/src
 
-# Source ROS 2 on every shell.
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc
 RUN echo "source /workspace/install/setup.bash" >> /root/.bashrc
 RUN echo "alias build='colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release'" >> /root/.bashrc
