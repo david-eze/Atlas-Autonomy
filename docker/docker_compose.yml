@@ -1,0 +1,20 @@
+services:
+  robot:
+    build: .
+    image: robot_autonomy:jazzy
+    container_name: robot_autonomy
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY:-}
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+    volumes:
+      - ../:/workspace/src/robot_autonomy:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/shm:/dev/shm
+    working_dir: /workspace
+    command: bash
+    stdin_open: true
+    tty: true
