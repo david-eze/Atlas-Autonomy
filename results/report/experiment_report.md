@@ -16,11 +16,11 @@
 
 ## Graphs
 
-![Planner Comparison](../graphs\planner_comparison.png)
+![Planner Comparison](https://github.com/david-eze/Atlas-Autonomy/blob/main/results/graphs/planner_comparison.png?raw=true)
 
-![Navigation Performance](../graphs\navigation_performance.png)
+![Navigation Performance](https://github.com/david-eze/Atlas-Autonomy/blob/main/results/graphs/navigation_performance.png?raw=true)
 
-![Localization Accuracy](../graphs\localization_accuracy.png)
+![Localization Accuracy](https://raw.githubusercontent.com/david-eze/Atlas-Autonomy/refs/heads/main/assets/localization_accuracy.png)
 
 ## Observations
 
