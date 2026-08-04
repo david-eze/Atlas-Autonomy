@@ -222,25 +222,25 @@ py -m unittest discover -s tests -p "test_*.py"
 ```text
 robot_autonomy/
 ├── src/
-│   ├── robot_description/      # URDF/Xacro models and Gazebo physics parameters
-│   ├── robot_bringup/          # Launch files (mapping, nav, exploration, mission)
-│   ├── robot_sensors/          # LiDAR filtering and sensor simulation nodes
-│   ├── robot_localization/     # EKF robot_localization parameters
-│   ├── robot_mapping/          # SLAM Toolbox configs and map storage
-│   ├── robot_navigation/       # Nav2 configs and Behavior Tree definitions
-│   ├── robot_planners/         # Custom C++ A* and Dijkstra planner plugins
-│   ├── robot_exploration/      # Frontier exploration and scoring node
-│   ├── robot_perception/       # Object detection wrapper and semantic world map
-│   ├── robot_safety/           # Deterministic safety monitor override node
-│   ├── robot_mission/          # Recovery manager, semantic nav, web dashboard
-│   ├── robot_tf2_diagnostics/  # TF tree launch-time diagnostic checker
-│   └── robot_benchmarking/     # Metric recorder, report & GIF generators
-├── config/                     # Shared YAML configuration profiles
-├── docs/                       # Architectural design documentation (12 files)
-├── results/                    # CSVs, PNG graphs, GIFs, and markdown reports
-├── scripts/                    # Benchmark execution scripts
-├── tests/                      # Python unit test suite
-├── docker/                     # Dockerfile and compose setup
+│   ├── robot_description/
+│   ├── robot_bringup/
+│   ├── robot_sensors/
+│   ├── robot_localization/
+│   ├── robot_mapping/
+│   ├── robot_navigation/
+│   ├── robot_planners/
+│   ├── robot_exploration/
+│   ├── robot_perception/
+│   ├── robot_safety/
+│   ├── robot_mission/
+│   ├── robot_tf2_diagnostics/
+│   └── robot_benchmarking/
+├── config/
+├── docs/
+├── results/
+├── scripts/
+├── tests/
+├── docker/
 └── README.md
 ```
 
