@@ -19,6 +19,8 @@ This platform implements an autonomous warehouse/service robot capable of operat
 * **AI Perception Separation**: Integrates object detection for semantic navigation ("Go to the workstation") while strictly isolating the AI layer from safety-critical motor control.
 * **Independent Safety Supervisor**: Deterministic safety monitor running at 20 Hz that overrides motion commands if obstacle clearance drops below 0.30 m.
 
+![Nav Replanning Demo](https://github.com/david-eze/Atlas-Autonomy/blob/main/results/gifs/navigation_replanning_demo.gif?raw=true)
+
 ---
 
 ## Project Demonstration
