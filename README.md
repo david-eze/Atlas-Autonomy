@@ -220,7 +220,7 @@ py -m unittest discover -s tests -p "test_*.py"
 ## Repository Structure
 
 ```text
-robot_autonomy/
+atlas_autonomy/
 ├── src/
 │   ├── robot_description/
 │   ├── robot_bringup/
