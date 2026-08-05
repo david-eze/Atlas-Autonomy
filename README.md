@@ -235,7 +235,6 @@ atlas_autonomy/
 │   ├── robot_mission/
 │   ├── robot_tf2_diagnostics/
 │   └── robot_benchmarking/
-├── config/
 ├── docs/
 ├── results/
 ├── scripts/
