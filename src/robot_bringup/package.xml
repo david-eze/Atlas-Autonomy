@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_bringup</name>
+  <version>0.1.0</version>
+  <description>Launch files for the autonomous robot simulation stack.</description>
+  <maintainer email="dev@robotautonomy.dev">robot_autonomy</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>robot_description</depend>
+  <depend>robot_sensors</depend>
+  <depend>robot_localization</depend>
+  <depend>robot_mapping</depend>
+  <depend>robot_navigation</depend>
+  <depend>robot_exploration</depend>
+  <depend>robot_perception</depend>
+  <depend>robot_safety</depend>
+  <depend>robot_mission</depend>
+  <depend>robot_tf2_diagnostics</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
