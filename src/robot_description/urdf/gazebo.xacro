@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Gazebo sensor plugins.
+    The 2D LiDAR is a GPU ray sensor publishing /scan.
+    The RGB-D camera publishes compressed image, depth image, and camera info.
+    The IMU publishes /imu/data with additive Gaussian noise.
+  -->
+
+  <xacro:macro name="autonomous_robot_gazebo">
+
+    <gazebo reference="laser_link">
+      <sensor type="gpu_ray" name="lidar_sensor">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>20</update_rate>
+        <visualize>false</visualize>
+        <topic>scan</topic>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${pi}</min_angle>
+              <max_angle>${pi}</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.12</min>
+            <max>15.0</max>
+            <resolution>0.005</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_lidar" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>scan:=scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/msg/LaserScan</output_type>
+          <frame_name>laser_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="camera_link">
+      <sensor type="depth" name="rgbd_camera_sensor">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <camera name="rgbd_camera">
+          <horizontal_fov>1.0472</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.2</near>
+            <far>10.0</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.002</stddev>
+          </noise>
+        </camera>
+        <plugin name="gazebo_ros_rgbd_camera" filename="libgazebo_ros_camera.so">
+          <ros>
+            <remapping>image:=camera/image_raw</remapping>
+            <remapping>camera_info:=camera/camera_info</remapping>
+            <remapping>depth_image:=camera/depth/image_raw</remapping>
+            <remapping>depth_camera_info:=camera/depth/camera_info</remapping>
+            <remapping>points:=camera/points</remapping>
+          </ros>
+          <baseline>0.03</baseline>
+          <frame_name>camera_depth_optical_frame</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="imu_link">
+      <sensor type="imu" name="imu_sensor">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>false</visualize>
+        <topic>imu/data</topic>
+        <plugin name="gazebo_ros_imu" filename="libgazebo_ros_imu.so">
+          <ros>
+            <remapping>imu/data:=imu/data</remapping>
+          </ros>
+          <initial_orientation_as_reference>false</initial_orientation_as_reference>
+          <frame_name>imu_link</frame_name>
+        </plugin>
+        <imu>
+          <angular_velocity>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>0.0002</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>0.0002</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>0.0002</stddev></noise></z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>0.005</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>0.005</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>0.005</stddev></noise></z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+    </gazebo>
+
+    <!--
+      Wheel friction properties.
+      mu1 (longitudinal) and mu2 (lateral) are asymmetric: high lateral
+      friction prevents sideways slip on the drive wheels, while the
+      passive caster is allowed to slide freely.
+    -->
+    <gazebo reference="left_wheel_link">
+      <mu1>0.9</mu1>
+      <mu2>0.9</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+    </gazebo>
+    <gazebo reference="right_wheel_link">
+      <mu1>0.9</mu1>
+      <mu2>0.9</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+    </gazebo>
+    <gazebo reference="caster_link">
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <parameters>$(find robot_description)/config/ros2_control.yaml</parameters>
+      </plugin>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>
