@@ -1,0 +1,11 @@
+lidar_filter:
+  ros__parameters:
+    input_topic: /scan
+    output_topic: /scan_filtered
+    noise_stddev: 0.01
+    max_range: 15.0
+    min_range: 0.12
+    dropout_probability: 0.01
+    burst_dropout_probability: 0.003
+    burst_length: 8
+    seed: 42
