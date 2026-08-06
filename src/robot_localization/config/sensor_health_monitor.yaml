@@ -1,0 +1,4 @@
+sensor_health_monitor:
+  ros__parameters:
+    timeout_seconds: 1.0
+    publish_rate_hz: 2.0
