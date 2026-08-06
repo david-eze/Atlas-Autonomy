@@ -1,0 +1,6 @@
+map_quality_monitor:
+  ros__parameters:
+    map_topic: /map
+    output_topic: /map_coverage
+    update_rate_hz: 1.0
+    occupied_threshold: 50
