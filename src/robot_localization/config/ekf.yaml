@@ -1,0 +1,120 @@
+# EKF sensor fusion configuration (robot_localization::ekf_node).
+#
+# This filter fuses:
+#   - /odom     (from diff_drive_controller) : x, y, yaw, vx, vyaw
+#   - /imu/data (from the Gazebo IMU plugin) : yaw
+#
+# robot_localization 3.x (Jazzy) uses a full 15-state vector
+# [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az];
+# process noise and sensor covariance parameters are therefore 15x15.
+#
+# Design decisions:
+#   - The odometry message's yaw comes from the diff-drive controller's
+#     quaternion integration and is weakly observable, so yaw is fused twice
+#     (odom + IMU); the IMU provides the high-rate orientation reference and
+#     the EKF blends the two according to their declared covariances.
+#   - Roll/pitch are not fused: two_d_mode forces them to zero anyway, so
+#     fusing them would be a no-op.
+#   - Linear accelerations are never fused: accelerometer double-integration
+#     on a wheeled indoor platform adds drift without improving the 2D
+#     kinematic state that planning/control actually consume.
+
+ekf:
+  ros__parameters:
+    frequency: 50.0
+    two_d_mode: true
+    publish_tf: true
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # Fuse x, y, yaw (position) and vx, vyaw (twist) from wheel odometry.
+    odom0: odom
+    odom0_config: [true,  true,  false,
+                   false, false, true,
+                   true,  false, false,
+                   false, false, true,
+                   false, false, false]
+
+    odom0_differential: false
+    odom0_queue_size: 10
+    odom0_nodelay: true
+
+    # Fuse yaw from the IMU.  Roll/pitch are not fused because two_d_mode
+    # forces them to zero anyway; no accelerations are fused.
+    imu0: imu/data
+    imu0_config: [false, false, false,
+                  false, false, true,
+                  false, false, false,
+                  false, false, false,
+                  false, false, false]
+
+    imu0_differential: false
+    # No accelerations are fused, so gravitational-acceleration removal is
+    # not applicable; leaving it true would only emit a node warning.
+    imu0_remove_gravitational_acceleration: false
+    imu0_queue_size: 10
+    imu0_nodelay: true
+
+    # Diagonal process noise (15x15):
+    #   x, y: 0.05, z: 0.06, roll/pitch: 0.03, yaw: 0.06,
+    #   vx/vy: 0.025, vz: 0.04, vroll/vpitch: 0.01, vyaw: 0.02,
+    #   ax/ay/az: 0.01.
+    process_noise_covariance: [0.05, 0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.05, 0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.06,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.03, 0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.03, 0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.06, 0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.025, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.025,0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.04, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.02, 0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,
+                               0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01]
+
+    # Odometry measurement noise (15x15):
+    #   x, y: 3 cm 1-sigma, yaw: ~0.8 deg, vx: 2 cm/s, vyaw: ~1.8 deg/s.
+    #   Entries are variances, so the values are sigma^2.
+    odom0_covariance: [0.0009, 0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0009, 0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  1e-6, 0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   1e-6, 0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   1e-6, 0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   2e-4,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0004, 0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,   0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.001, 0.0,  0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   1e-6, 0.0,  0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  1e-6, 0.0,
+                       0.0,  0.0,  0.0,   0.0,   0.0,   0.0,    0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  1e-6]
+
+    # IMU measurement noise (15x15): ~0.2 deg 1-sigma on roll/pitch,
+    # ~0.5 deg on yaw; all other states unobserved (infinite variance).
+    # Entries are variances, so the values are sigma^2.
+    # Yaw variance (7.6e-5) is smaller than the odometry yaw variance
+    # (2e-4), so the IMU is the dominant high-rate orientation reference
+    # as intended by the design.
+    imu0_covariance: [1e-6, 0.0,  0.0,  0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  1e-6, 0.0,  0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  1e-6, 0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   1.2e-5, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   1.2e-5, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   7.6e-5, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,
+                      0.0,  0.0,  0.0,   0.0,   0.0,   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-6]
