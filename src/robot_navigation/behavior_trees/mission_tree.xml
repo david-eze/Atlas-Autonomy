@@ -1,0 +1,43 @@
+<!--
+  Custom mission behaviour tree.
+
+  Structure:
+    Root
+    └── PipelineSequence
+        ├── RateController (1 Hz) -> ComputePathToPose (replans while following)
+        ├── FollowPath
+        └── RecoveryNode
+            └── ReactiveFallback
+                ├── Stuck: ClearCostmap -> Spin
+                ├── Blocked: Wait -> BackUp -> Replan
+                └── AlwaysFailure -> propagates to RecoveryNode retries
+
+  Only stock Nav2 behaviour-tree nodes are used so the tree loads with
+  the standard plugin library configured in bt_navigator.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <PipelineSequence name="NavigateWithRecovery">
+      <RateController hz="1.0">
+        <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+      </RateController>
+      <FollowPath path="{path}" controller_id="FollowPath"/>
+      <RecoveryNode number_of_retries="6" name="RecoveryActions">
+        <ReactiveFallback name="RecoveryFallback">
+          <ReactiveSequence name="StuckRecovery">
+            <IsStuck/>
+            <ClearEntireCostmap name="ClearLocalCostmap" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap" service_name="global_costmap/clear_entirely_global_costmap"/>
+            <Spin spin_dist="1.57" time_allowance="10.0"/>
+          </ReactiveSequence>
+          <ReactiveSequence name="BlockedProgressRecovery">
+            <Wait wait_duration="1.0"/>
+            <BackUp backup_dist="0.25" backup_speed="0.15"/>
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+          </ReactiveSequence>
+          <AlwaysFailure/>
+        </ReactiveFallback>
+      </RecoveryNode>
+    </PipelineSequence>
+  </BehaviorTree>
+</root>
