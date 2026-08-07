@@ -1,0 +1,8 @@
+<library path="robot_planners_core">
+  <class name="robot_planners/AstarPlanner" type="robot_planners::AstarPlanner" base_class_type="nav2_core::GlobalPlanner">
+    <description>A* global planner using the octile heuristic on the costmap grid.</description>
+  </class>
+  <class name="robot_planners/DijkstraPlanner" type="robot_planners::DijkstraPlanner" base_class_type="nav2_core::GlobalPlanner">
+    <description>Dijkstra global planner (heuristic disabled) on the costmap grid.</description>
+  </class>
+</library>
