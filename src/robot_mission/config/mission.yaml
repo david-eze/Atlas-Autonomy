@@ -1,0 +1,8 @@
+recovery_manager:
+  ros__parameters:
+    localization_covariance_threshold: 0.5
+
+semantic_navigation:
+  ros__parameters:
+    input_topic: /mission/command
+    map_frame: map
