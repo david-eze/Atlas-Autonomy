@@ -1,0 +1,9 @@
+detection_node:
+  ros__parameters:
+    model_path: yolov8n.pt
+    confidence_threshold: 0.5
+    image_topic: /camera/image_raw
+    depth_topic: /camera/depth/image_raw
+    camera_info_topic: /camera/camera_info
+    map_frame: map
+    camera_frame: camera_depth_optical_frame
