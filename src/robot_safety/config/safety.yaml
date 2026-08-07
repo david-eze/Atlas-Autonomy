@@ -1,0 +1,10 @@
+safety_monitor:
+  ros__parameters:
+    scan_topic: /scan_filtered
+    cmd_vel_in: /cmd_vel
+    cmd_vel_out: /cmd_vel_safe
+    min_obstacle_distance: 0.25
+    hard_stop_distance: 0.20
+    max_linear_velocity: 1.2
+    max_angular_velocity: 1.5
+    max_scan_age: 0.5
